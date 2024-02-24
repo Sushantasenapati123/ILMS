@@ -1,0 +1,261 @@
+
+@{
+    ViewData["Title"] = "ViewDemo_T_LMS";
+}
+<div class="row">
+    @Html.AntiForgeryToken()
+    @*Write code here*@
+</div><div>
+    <ul class="nav nav-tabs nav-fill" role="tablist">
+        <a class="nav-item nav-link " asp-controller="mod" asp-action="Demo_T_LMS">Add</a>
+        <a class="nav-item nav-link active" asp-controller="mod" asp-action=ViewDemo_T_LMS>View</a>
+    </ul>
+</div>
+<br />
+<br />
+<br />
+<div class="col-sm-12 col-md-4 col-lg-4">
+    <div class="form-group mb-3">
+        <label for="exampleInputEmail1" class="form-label">
+            Department<span class="text-danger">*</span>
+        </label>
+        <select class="form-select" id="ddlDept">
+            <option selected="selected" value="0">-All-</option>
+            <option value="11">Finance</option>
+            <option value="33">Medicine</option>
+            <option value="66">Medicine</option>
+        </select>
+    </div>
+</div>
+
+<div class="col-sm-12 col-md-4 col-lg-4">
+    <div class="form-group mb-3">
+        <label for="exampleInputEmail1" class="form-label">
+            Govt. Party<span class="text-danger">*</span>
+        </label>
+        <select class="form-select" id="ddlOpp">
+            <option value="22">BJD</option>
+            <option value="44">BJP</option>
+            <option value="88">BJP</option>
+        </select>
+    </div>
+    <div class="form-group mb-3">
+        <label for="exampleInputEmail1" class="form-label">
+            Name<span class="text-danger">*</span>
+        </label>
+        <input type="text" id="name" />
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-4">
+        <input type="button" class="btn btn-secondary mt-4" value="Add More" id="btnAddMore" />
+    </div>
+</div>
+<div>
+
+    <br />
+    <table class="table" id="tbl">
+        <thead>
+            <tr>
+                @*<th>
+                    ID
+                </th>*@
+                <th>
+                    Deptid
+                </th>
+                <th>
+                    Govtpaty
+                </th>
+                <th>
+                    Name
+                </th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="text-right">
+    <button type="submit" id="submitBtn" class="btn btn-secondary">Update</button>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $("#btnAddMore").click(function () {
+            // Get selected values from dropdowns
+            var deptId = $("#ddlDept").val();
+            var govtParty = $("#ddlOpp ").val();
+            var nam = $("#name ").val();
+
+            // Add a new row to the table
+            var newRow = "<tr><td>" + deptId + "</td><td>" + govtParty + "</td><td>" + nam + "</td></tr>";
+            $("#tbl tbody").append(newRow);
+        });
+    });
+$(document).ready(function(){
+	Get_Demo_T_LMS();
+	});
+    function encryptData(data) {
+        // Convert the integer data to a string
+        var dataString = String(data);
+
+        // Encrypt the data using CryptoJS
+        var encryptedData = CryptoJS.AES.encrypt(JSON.stringify({ data: dataString }), 'secret_key').toString();
+
+        return encryptedData;
+    }
+	function Get_Demo_T_LMS() {
+		$.ajax ({
+		 type:'Get',
+		 dataType: 'Json',
+		 contentType: 'application/json; charset=utf-8',
+		 data: { },
+			url: "@Url.Action("Get_Demo_T_LMS","mod")",
+			success: function (result) {
+				var data1 = JSON.parse(result);
+				if (data1.length > 0) {
+				$('#tbl.tbody').empty();
+					$.each(data1, function (i, data) {
+
+                        var encryptedID = encryptData(data.ID); var trows = "<tr>";
+                     
+					trows = trows +"<td>"+ data.DeptId +"</td>";
+                        trows = trows + "<td>" + data.GovtPaty + "</td>";
+                        trows = trows + "<td>" + data.Name + "</td>";
+					trows = trows + "</tr>";
+					$('#tbl').append(trows);
+					});
+				}
+			},
+		error: function (Message) {
+		alert(Message);
+			}
+		});
+		}
+
+     function Delete_Demo_T_LMS(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                  $.ajax({
+                    type: "Delete",
+                    dataType: "json",
+                    url: "@Url.Action("Delete_Demo_T_LMS","mod")",
+
+                    data: { "Id": id },
+                      success: function (response) {
+                          Swal.fire(
+                              'Deleted!',
+                              'Data Deleted Successfully!',
+                              'success'
+                        ).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href = "/mod/ViewDemo_T_LMS";
+                            }
+                            else if (result.isDenied) {
+                                Swal.fire('Changes are not saved', '', 'info')
+                            }
+                        })
+                    }
+                });
+
+            }
+            return false;
+        })
+     }
+    $("#submitBtn").click(function () {
+        if (true) {
+            debugger
+            var Items = []; //array declaring to store the records to send it to controller
+            var entity = {};
+            var tbl = document.getElementById('tbl');
+            for (var i = 1; i < tbl.rows.length; i++) {
+                var item1 = {};
+                /*item1.ID = tbl.rows[i].children[0].textContent;*/
+                item1.DeptId = tbl.rows[i].children[0].textContent;
+                item1.GovtPaty = tbl.rows[i].children[1].textContent;
+                item1.Name = tbl.rows[i].children[2].textContent;
+              
+                Items.push(item1);
+            }
+           
+            entity.ListData = Items;
+
+            $.ajax({
+                url: "/mod/inSertEntireData",
+                data: entity,
+                type: "POST",
+                success: function (result) {
+
+                },
+                error: function (errormessage) {
+                    alert("error");
+                }
+            });
+        };
+    });
+    $("#submitBtnmm").click(function () {
+       
+       
+
+        var gParties = [];
+        var entity = {};
+
+        var table = document.getElementById('tbl').getElementsByTagName('tbody')[0];
+
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+
+            // Assuming you have four cells (change indices accordingly if you have a different number of cells)
+            var ID = row.cells[0].innerText;
+            var DeptId = row.cells[1].innerText;
+            var GovtParty = row.cells[2].innerText;
+            var Nm = row.cells[3].innerText;
+
+            // Assuming you want to push an object with DeptId and GovtParty into the gParties array
+            gParties.push({ID:ID, DeptId: DeptId, GovtParty: GovtParty,Name:Nm });
+        }
+        //====================================================
+        entity.ListData = gParties;
+        
+        $.ajax({
+            type: "POST",
+            url: "/mod/inSertEntireData",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: entity,
+            content: 'application/json;charset=utf-8',
+            dataType: "json",
+            success: function (result) {
+                Swal.fire({
+                    icon: 'success',
+                    title: result.responseText,
+                    text: result.responseMessage,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = "/mod/ViewDemo_T_LMS";
+                    }
+                })
+            },
+            error: function (result) {
+                Swal.fire({
+                    icon: 'error',
+                    title: result.responseText,
+                    text: result.responseMessage,
+                });
+            },
+        });
+
+
+    });
+</script>

@@ -1,0 +1,9 @@
+[
+  {
+    "PageName": "Demo_T_LMS",
+    "ModuleName": "mod",
+    "StoreProcedureName": "USP_Demo_T_LMS_Copy_1",
+    "Actions": "I/V",
+    "PageType": "Demo_T_LMS/ViewDemo_T_LMS"
+  }
+]
